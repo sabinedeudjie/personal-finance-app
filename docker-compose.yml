@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules # Empêche le montage du node_modules local
+    env_file:
+      - ./backend/.env
+    networks:
+      - app-network
+    depends_on:
+      - database # Si vous avez une base de données, ajoutez-la ici
+
+  frontend:
+    build:
+      context: ./frontend/my-react-app
+      dockerfile: Dockerfile
+    ports:
+      - "80:80" # Le frontend sera accessible sur le port 80 de votre machine
+    networks:
+      - app-network
+    # Si vous utilisez des variables d'environnement pour le frontend, vous pouvez les passer ici
+    # environment:
+    #   - VITE_API_URL=http://backend:3000/api # Exemple d'accès au backend via le nom du service
+
+networks:
+  app-network:
+    driver: bridge
