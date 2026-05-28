@@ -5,6 +5,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -20,12 +21,12 @@ model User {
 }
 
 model Category {
-  id         String   @id @default(uuid())
+  id         String          @id @default(uuid())
   user_id    String?
-  name       String   @db.VarChar(100)
+  name       String          @db.VarChar(100)
   type       TransactionType
-  icon       String?  @db.VarChar(50)
-  created_at DateTime @default(now())
+  icon       String?         @db.VarChar(50)
+  created_at DateTime        @default(now())
 
   user         User?         @relation(fields: [user_id], references: [id], onDelete: Cascade)
   transactions Transaction[]
@@ -34,14 +35,14 @@ model Category {
 }
 
 model Transaction {
-  id          String   @id @default(uuid())
+  id          String          @id @default(uuid())
   user_id     String
   category_id String?
-  amount      Decimal  @db.Decimal(12, 2)
-  date        DateTime @db.Date
+  amount      Decimal         @db.Decimal(12, 2)
+  date        DateTime        @db.Date
   type        TransactionType
   notes       String?
-  created_at  DateTime @default(now())
+  created_at  DateTime        @default(now())
 
   user     User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
   category Category? @relation(fields: [category_id], references: [id])
