@@ -11,7 +11,6 @@ services:
       - ./backend:/app
       - /app/node_modules
     env_file:
-      - ./backend/.env
     networks:
       - app-network
     depends_on:
@@ -22,7 +21,6 @@ services:
       context: ./frontend/my-react-app
       dockerfile: Dockerfile
     ports:
-      - "80:80"
     networks:
       - app-network
 
