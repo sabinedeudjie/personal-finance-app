@@ -14,10 +14,15 @@ async function main() {
         await prisma.category.upsert({
             where: { id: cat.name }, // juste pour éviter les doublons
             update: {},
-            create: cat,
-        })
+            create: {
+                name: cat.name,
+                type: cat.type,
+                icon: cat.icon,
+                user_id: null,
+            },
+        });
     }
-    console.log('Seed terminé ✅')
+    console.log('Seed terminé ')
 }
 
 main().finally(() => prisma.$disconnect())

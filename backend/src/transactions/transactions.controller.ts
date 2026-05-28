@@ -3,11 +3,11 @@ import { Controller, Get, Post, Put, Delete,
 import { TransactionsService } from './transactions.service'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { Request as ExpressRequest } from 'express'
-import type { TransactionFilters } from "src/interfaces/transaction-filters.interface"
+import type { TransactionFilters } from "../interfaces/transaction-filters.interface"
 import type {CreateTransactionData} from "../interfaces/create-transaction-data.interface";
 
 interface AuthRequest extends ExpressRequest {
-    user: { userId: string }
+    user: { user_id: string }
 }
 
 
@@ -18,12 +18,12 @@ export class TransactionsController {
 
     @Get()
     findAll(@Request() req:AuthRequest, @Query() query:TransactionFilters) {
-        return this.transactionsService.findAll(req.user.userId, query)
+        return this.transactionsService.findAll(req.user.user_id, query)
     }
 
     @Post()
     create(@Request() req:AuthRequest, @Body() body:CreateTransactionData) {
-        return this.transactionsService.create(req.user.userId, body)
+        return this.transactionsService.create(req.user.user_id, body)
     }
 
     @Put(':id')

@@ -5,7 +5,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard' // guard de l'équipe auth
 import { Request as ExpressRequest } from 'express'
 
 interface AuthRequest extends ExpressRequest{
-    user : { userId: string}
+    user : { user_id: string}
 }
 @UseGuards(JwtAuthGuard)
 @Controller('categories')
@@ -14,12 +14,12 @@ export class CategoriesController {
 
     @Get()
     findAll(@Request() req:AuthRequest) {
-        return this.categoriesService.findAll(req.user.userId)
+        return this.categoriesService.findAll(req.user.user_id)
     }
 
     @Post()
     create(@Request() req:AuthRequest, @Body() body: {name: string; type: string, icon?: string} ) {
-        return this.categoriesService.create(req.user.userId, body)
+        return this.categoriesService.create(req.user.user_id, body)
     }
 
     @Put(':id')
