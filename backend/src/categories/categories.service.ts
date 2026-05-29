@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import {PrismaService} from "../../prisma/prisma.service";
+import {PrismaService} from "../prisma/prisma.service";
 
 @Injectable()
 export class CategoriesService {
@@ -13,12 +13,12 @@ export class CategoriesService {
 
     create(user_id: string, data: { name: string; type: string; icon?: string }) {
         return this.prisma.category.create({
-            data: { ...data, user_id }
+            data: { ...data, user_id } as any
         })
     }
 
     update(id: string, data: { name?: string; type?: string; icon?: string }) {
-        return this.prisma.category.update({ where: { id }, data })
+        return this.prisma.category.update({ where: { id }, data: data as any })
     }
 
     remove(id: string) {

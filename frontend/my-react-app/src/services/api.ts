@@ -31,6 +31,15 @@ export interface Transaction {
 }
 
 
+export interface TransactionFilters {
+  from?: string;
+  to?: string;
+  type?: 'income' | 'expense';
+  category_id?: string;
+  skip?: number;
+  take?: number;
+}
+
 // Categories
 export const getCategories = (): Promise<Category[]> =>
   api.get('/categories').then(r => r.data);

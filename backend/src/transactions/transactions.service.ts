@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from "prisma/prisma.service";
+import { PrismaService } from "../prisma/prisma.service";
 import {TransactionFilters} from "../interfaces/transaction-filters.interface";
 import {CreateTransactionData} from "../interfaces/create-transaction-data.interface";
-import { TransactionResponse } from 'src/interfaces/transaction.interface';
+import { TransactionResponse } from '../interfaces/transaction.interface';
 
 @Injectable()
 export class TransactionsService {
@@ -12,7 +12,7 @@ export class TransactionsService {
         return this.prisma.transaction.findMany({
             where: {
                 user_id,
-                ...(type ? {type}: {}),
+                ...(type ? {type: type as any}: {}),
                 ...(category_id ? {category_id}: {}),
                 ...(from || to ?{
                     date: {
@@ -27,23 +27,19 @@ export class TransactionsService {
             orderBy: {date: 'desc' },
             skip: Number(skip),
             take: Number(take),
-        }) as Promise<TransactionResponse>[];
+        }) as unknown as Promise<TransactionResponse[]>;
     }
     create(user_id: string, data: CreateTransactionData): Promise<TransactionResponse>{
         return this.prisma.transaction.create({
             data: { ...data, date: new Date(data.date), user_id, },
             include: {category: true},
-        }) as Promise<TransactionResponse>;
+        }) as unknown as Promise<TransactionResponse>;
     }
-    update(id: string, data: Partial<CreateTransactionData>); Promise<TransactionResponse>{
+    update(id: string, data: Partial<CreateTransactionData>): Promise<TransactionResponse> {
         return this.prisma.transaction.update({
             where: {id},
-            data: {...data, ...(data.date? {date: new Date(data.date)} : {}),
-
-    },
-
-
-        });
+            data: {...data, ...(data.date ? {date: new Date(data.date)} : {})},
+        }) as unknown as Promise<TransactionResponse>;
     }
     remove(id: string){
         return this.prisma.transaction.delete({where: {id}})

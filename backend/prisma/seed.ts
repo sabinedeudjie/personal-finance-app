@@ -24,7 +24,7 @@ const globalCategories: { name: string; type: TransactionType; icon: string }[] 
 async function main() {
   console.log('Seeding global categories...');
 
-  await prisma.category.deleteMany({ where: { user_id: null } });
+  await prisma.category.deleteMany({ where: { userId: null } });
 
   await prisma.category.createMany({
     data: globalCategories.map((c) => ({ ...c, user_id: null })),
