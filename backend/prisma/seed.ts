@@ -24,11 +24,10 @@ const globalCategories: { name: string; type: TransactionType; icon: string }[] 
 async function main() {
   console.log('Seeding global categories...');
 
-  // Supprime les catégories globales existantes pour éviter les doublons
   await prisma.category.deleteMany({ where: { userId: null } });
 
   await prisma.category.createMany({
-    data: globalCategories.map((c) => ({ ...c, userId: null })),
+    data: globalCategories.map((c) => ({ ...c, user_id: null })),
   });
 
   console.log(`${globalCategories.length} categories created.`);
