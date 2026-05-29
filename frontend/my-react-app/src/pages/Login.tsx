@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { TrendingUp, Eye, EyeOff, ArrowRight } from "lucide-react";
-import { C } from "../constants/designTokens";
-import { Btn } from "../primitives/Components";
+import { TrendingUp, Eye, EyeOff, ArrowRight } from "lucide-react",
 
 export default function Login({ setPage }: { setPage: (p: string) => void }) {
   const [showPwd, setShowPwd] = useState(false);
