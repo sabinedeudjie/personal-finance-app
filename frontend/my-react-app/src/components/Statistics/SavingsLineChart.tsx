@@ -1,7 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import {
   Chart as ChartJS,
-  BarElement,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -9,35 +8,36 @@ import {
   Title,
   Tooltip,
   Legend,
-  BarController,
+  Filler,
+  LineController,
+  type Chart,
   type ChartData,
   type ChartOptions,
   type TooltipItem,
 } from 'chart.js';
-import { Bar } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import { C } from '../../theme/colors';
 import { useChartTheme } from '../../hooks/useChartTheme';
 
 ChartJS.register(
-  BarController,
-  BarElement,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler,
+  LineController
 );
 
-interface MonthlyData {
+export interface BalanceTrendPoint {
   month: string;
-  income: number;
-  expenses: number;
+  balance: number;
 }
 
-interface IncomeExpenseChartProps {
-  data: MonthlyData[];
+interface SavingsLineChartProps {
+  data: BalanceTrendPoint[];
 }
 
 const formatCurrency = (value: number): string =>
@@ -53,37 +53,34 @@ const formatCompact = (value: string | number): string =>
     compactDisplay: 'short',
   }).format(Number(value));
 
-export default function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
+export default function SavingsLineChart({ data }: SavingsLineChartProps) {
+  const chartRef = useRef<Chart<'line'> | null>(null);
   const chartTheme = useChartTheme();
 
-  const chartData: ChartData<'bar'> = useMemo(
+  const chartData: ChartData<'line'> = useMemo(
     () => ({
       labels: data.map((d) => d.month),
       datasets: [
         {
-          label: 'Revenus',
-          data: data.map((d) => d.income),
-          backgroundColor: 'rgba(0, 230, 118, 0.85)',
+          label: 'Solde cumulé',
+          data: data.map((d) => d.balance),
           borderColor: C.green,
-          borderWidth: 0,
-          borderRadius: 8,
-          borderSkipped: false,
-        },
-        {
-          label: 'Dépenses',
-          data: data.map((d) => d.expenses),
-          backgroundColor: 'rgba(68, 138, 255, 0.75)',
-          borderColor: C.blue,
-          borderWidth: 0,
-          borderRadius: 8,
-          borderSkipped: false,
+          backgroundColor: 'rgba(0, 230, 118, 0.15)',
+          borderWidth: 2.5,
+          pointBackgroundColor: C.green,
+          pointBorderColor: chartTheme.doughnutBorder,
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 7,
+          tension: 0.4,
+          fill: true,
         },
       ],
     }),
-    [data]
+    [chartTheme.doughnutBorder, data]
   );
 
-  const options: ChartOptions<'bar'> = useMemo(
+  const options: ChartOptions<'line'> = useMemo(
     () => ({
       responsive: true,
       maintainAspectRatio: false,
@@ -94,9 +91,9 @@ export default function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
         tooltip: {
           ...chartTheme.tooltip,
           callbacks: {
-            label: (context: TooltipItem<'bar'>) => {
+            label: (context: TooltipItem<'line'>) => {
               const value = context.parsed.y ?? 0;
-              return ` ${context.dataset.label}: ${formatCurrency(value)}`;
+              return ` Solde: ${formatCurrency(value)}`;
             },
           },
         },
@@ -124,9 +121,30 @@ export default function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
     [chartTheme]
   );
 
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+
+    const { ctx, height } = chart;
+    const gradient = ctx.createLinearGradient(0, 0, 0, height || 280);
+    gradient.addColorStop(0, chartTheme.lineFillStart);
+    gradient.addColorStop(0.55, chartTheme.lineFillMid);
+    gradient.addColorStop(1, chartTheme.lineFillEnd);
+
+    const dataset = chart.data.datasets[0];
+    if (dataset) {
+      dataset.backgroundColor = gradient;
+      chart.update('none');
+    }
+  }, [chartTheme, data]);
+
+  if (data.length === 0) {
+    return <p className="chart-empty">Pas de données d&apos;épargne disponibles.</p>;
+  }
+
   return (
-    <div className="chart-wrapper">
-      <Bar data={chartData} options={options} />
+    <div className="chart-wrapper chart-wrapper--tall">
+      <Line ref={chartRef} data={chartData} options={options} />
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Register() {
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +26,7 @@ export default function Register() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Inscription avec :', { name, email, password });
+    navigate('/login');
   };
 
   return (
@@ -37,7 +39,7 @@ export default function Register() {
         
         {/* Logo (Épuré sans icône) */}
         <div className="relative z-10 flex items-center gap-2 text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-blue-500 bg-clip-text text-transparent">
-          Finova
+          Nkapflow
         </div>
 
         {/* Liste des avantages */}
@@ -64,7 +66,7 @@ export default function Register() {
 
         {/* Footer panneau */}
         <div className="relative z-10 text-xs text-gray-600">
-          &copy; 2026 Finova Inc. Tous droits réservés.
+          &copy; 2026 Nkapflow. Tous droits réservés.
         </div>
       </div>
 
