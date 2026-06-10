@@ -1,30 +1,36 @@
-import { PrismaClient, TransactionType } from '@prisma/client';
+import {
+  PrismaClient,
+  TransactionType,
+} from '../src/generated/client/client.js';
+import { createDbAdapter } from '../src/lib/db-adapter.js';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({ adapter: createDbAdapter() });
 
-const globalCategories: { name: string; type: TransactionType; icon: string }[] = [
+const globalCategories: {
+  name: string;
+  type: TransactionType;
+  icon: string;
+}[] = [
   // Revenus
-  { name: 'Salaire',          type: TransactionType.income,  icon: 'work' },
-  { name: 'Freelance',        type: TransactionType.income,  icon: 'computer' },
-  { name: 'Investissements',  type: TransactionType.income,  icon: 'trending_up' },
-  { name: 'Autres revenus',   type: TransactionType.income,  icon: 'attach_money' },
+  { name: 'Salaire', type: TransactionType.income, icon: '💰' },
+  { name: 'Freelance', type: TransactionType.income, icon: '💻' },
+  { name: 'Investissements', type: TransactionType.income, icon: '📈' },
   // Dépenses
-  { name: 'Loyer',            type: TransactionType.expense, icon: 'home' },
-  { name: 'Courses',          type: TransactionType.expense, icon: 'shopping_cart' },
-  { name: 'Transport',        type: TransactionType.expense, icon: 'directions_car' },
-  { name: 'Restaurant',       type: TransactionType.expense, icon: 'restaurant' },
-  { name: 'Santé',            type: TransactionType.expense, icon: 'local_hospital' },
-  { name: 'Loisirs',          type: TransactionType.expense, icon: 'sports_esports' },
-  { name: 'Abonnements',      type: TransactionType.expense, icon: 'subscriptions' },
-  { name: 'Éducation',        type: TransactionType.expense, icon: 'school' },
-  { name: 'Vêtements',        type: TransactionType.expense, icon: 'checkroom' },
-  { name: 'Autres dépenses',  type: TransactionType.expense, icon: 'more_horiz' },
+  { name: 'Loyer', type: TransactionType.expense, icon: '🏠' },
+  { name: 'Courses', type: TransactionType.expense, icon: '🛒' },
+  { name: 'Transport', type: TransactionType.expense, icon: '🚗' },
+  { name: 'Alimentation', type: TransactionType.expense, icon: '🍽️' },
+  { name: 'Santé', type: TransactionType.expense, icon: '⚕️' },
+  { name: 'Loisirs', type: TransactionType.expense, icon: '🎮' },
+  { name: 'Abonnements', type: TransactionType.expense, icon: '📱' },
+  { name: 'Éducation', type: TransactionType.expense, icon: '🎓' },
+  { name: 'Vêtements', type: TransactionType.expense, icon: '👗' },
 ];
 
 async function main() {
   console.log('Seeding global categories...');
 
-  await prisma.category.deleteMany({ where: { userId: null } });
+  await prisma.category.deleteMany({ where: { user_id: null } });
 
   await prisma.category.createMany({
     data: globalCategories.map((c) => ({ ...c, user_id: null })),

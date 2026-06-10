@@ -7,7 +7,7 @@ import { create } from 'node:domain';
 describe('AuthService', () => {
   let service: AuthService;
 
-  const mockPrismaService  = {
+  const mockPrismaService = {
     user: {
       findUnique: jest.fn(),
       create: jest.fn(),
@@ -16,10 +16,14 @@ describe('AuthService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService, JwtService, {
-        provide: PrismaService,
-        useValue: mockPrismaService,
-      }],
+      providers: [
+        AuthService,
+        JwtService,
+        {
+          provide: PrismaService,
+          useValue: mockPrismaService,
+        },
+      ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);

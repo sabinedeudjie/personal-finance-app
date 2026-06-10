@@ -4,10 +4,12 @@ import { AuthController } from './auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './auth.strategy';
-import { PrismaModule } from '../prisma/prisma.module'; 
+import { PrismaModule } from '../prisma/prisma.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule,
     PrismaModule, // Permet à AuthService de parler à PostgreSQL via Prisma
     PassportModule,
     JwtModule.register({
