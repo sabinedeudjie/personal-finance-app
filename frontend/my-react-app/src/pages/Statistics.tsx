@@ -51,11 +51,7 @@ export default function Statistics() {
         </div>
       </div>
 
-      {usingLocalStorage && (
-        <div className="api-notice">
-          Statistiques calculées à partir de vos transactions locales.
-        </div>
-      )}
+      {usingLocalStorage}
 
       <div className="stats-grid">
         <BalanceCard

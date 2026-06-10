@@ -9,25 +9,30 @@ import {
   LogOut,
   Menu,
   X,
+  Tags,
 } from 'lucide-react';
 import { C } from '../../theme/colors';
 import { useAuth } from '../../hooks/useAuth';
+import { useFinance } from '../../context/FinanceContext';
 import ThemeToggle from '../ui/ThemeToggle';
 
 const navItems = [
   { to: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
   { to: '/statistics', label: 'Statistiques', icon: BarChart3 },
   { to: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
+  { to: '/categories', label: 'Catégories', icon: Tags },
   { to: '/settings', label: 'Paramètres', icon: Settings },
 ];
 
 export default function AppLayout() {
   const { user, logout } = useAuth();
+  const { reset } = useFinance();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = () => {
-    logout();
+    reset();  
+    logout(); 
     navigate('/login');
   };
 

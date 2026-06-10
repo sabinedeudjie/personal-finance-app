@@ -1,4 +1,4 @@
-import type { Transaction } from '../services/api';
+import type { Transaction } from '../services/transactions.api';
 
 export interface FinancialSummary {
   income: number;

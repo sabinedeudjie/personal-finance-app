@@ -1,4 +1,3 @@
-import React, { useMemo } from 'react';
 import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface BalanceCardProps {
@@ -41,7 +40,7 @@ export default function BalanceCard({
       </div>
       <div className="balance-card-amount">{formatAmount(amount)}</div>
       <div className="balance-card-title">{title}</div>
-      {showTrend && <div className="balance-card-subtitle">vs mois dernier</div>}
+      {showTrend}
       <div className="balance-card-glow" />
     </div>
   );

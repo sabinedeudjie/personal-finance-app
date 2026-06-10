@@ -1,0 +1,43 @@
+/* ================================================================
+   CategoryForm.module.css
+   ================================================================ */
+
+.iconLabel {
+  color: var(--text-muted);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.iconSection {
+  margin-bottom: 1rem;
+}
+
+.emojiGrid {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.emojiBtn {
+  font-size: 1.5rem;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.emojiBtnDefault {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+}
+
+.emojiBtnActive {
+  background: var(--green);
+  border: 1px solid var(--green);
+}

@@ -10,9 +10,9 @@ export default function Input({ label, style, ...rest }: InputProps) {
     width: '100%',
     padding: '13px 16px',
     borderRadius: 12,
-    border: `1px solid ${C.inputBorder}`,
-    background: C.inputBg,
-    color: C.t1,
+    border: '1px solid var(--input-border)',
+    background: 'var(--input-bg)',
+    color: 'var(--text-primary)',
     fontSize: 14,
     fontFamily: "'DM Sans', sans-serif",
     outline: 'none',
@@ -26,7 +26,7 @@ export default function Input({ label, style, ...rest }: InputProps) {
       {label && (
         <label
           style={{
-            color: C.t3,
+            color: 'var(--text-muted)',
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.15em',
@@ -42,11 +42,11 @@ export default function Input({ label, style, ...rest }: InputProps) {
         {...rest}
         style={inputStyle}
         onFocus={(e) => {
-          e.target.style.borderColor = C.green;
+          e.target.style.borderColor = 'var(--green)';
           rest.onFocus?.(e);
         }}
         onBlur={(e) => {
-          e.target.style.borderColor = C.inputBorder;
+          e.target.style.borderColor = 'var(--input-border)';
           rest.onBlur?.(e);
         }}
       />

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Wallet, TrendingUp, TrendingDown } from 'lucide-react';
 import BalanceCard from '../components/Dashboard/BalanceCard';
 import CategoryPieChart from '../components/Dashboard/CategoryPieChart';
@@ -6,6 +5,7 @@ import IncomeExpenseChart from '../components/Dashboard/IncomeExpenseChart';
 import { useAuth } from '../hooks/useAuth';
 import { useFinance } from '../context/FinanceContext';
 import { CHART_CATEGORY_COLORS } from '../theme/colors';
+import { DashboardSkeleton } from '../components/ui/Skeleton';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -26,9 +26,8 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="dashboard-loading">
-        <div className="loading-spinner" />
-        <p>Chargement du tableau de bord...</p>
+      <div className="dashboard">
+        <DashboardSkeleton />
       </div>
     );
   }
@@ -52,11 +51,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {usingLocalStorage && (
-        <div className="api-notice">
-          Données locales — vos transactions sont sauvegardées sur cet appareil.
-        </div>
-      )}
+      {usingLocalStorage}
 
       <div className="stats-grid">
         <BalanceCard

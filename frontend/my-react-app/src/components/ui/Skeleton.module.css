@@ -1,0 +1,80 @@
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--theme-card) 25%,
+    var(--theme-card-hover) 50%,
+    var(--theme-card) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Variantes de taille ── */
+.text {
+  height: 0.875rem;
+  border-radius: 4px;
+}
+
+.title {
+  height: 1.5rem;
+  border-radius: 6px;
+}
+
+.card {
+  height: 110px;
+  border-radius: 16px;
+}
+
+.chart {
+  height: 260px;
+  border-radius: 16px;
+}
+
+.circle {
+  border-radius: 50%;
+}
+
+/* ── Dashboard Skeleton Layout ── */
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.chartsGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.25rem;
+}
+
+.skeletonCard {
+  background: var(--theme-card);
+  border: 1px solid var(--theme-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.skeletonCardTop {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+  }
+  .chartsGrid {
+    grid-template-columns: 1fr;
+  }
+}

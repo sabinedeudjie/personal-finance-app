@@ -11,10 +11,15 @@ import {
   createTransaction as apiCreateTransaction,
   updateTransaction as apiUpdateTransaction,
   deleteTransaction as apiDeleteTransaction,
-  getCategories,
   type Transaction,
+} from '../services/transactions.api';
+import {
+  getCategories,
+  createCategory as apiCreateCategory,
+  updateCategory as apiUpdateCategory,
+  deleteCategory as apiDeleteCategory,
   type Category,
-} from '../services/api';
+} from '../services/categories.api';
 import {
   computeSummary,
   computeMonthlyData,
@@ -28,7 +33,7 @@ import {
 } from '../utils/financeCalculations';
 import { useAuth } from '../hooks/useAuth';
 
-const STORAGE_KEY = 'nkapflow_transactions';
+const getStorageKey = (userId?: string) => userId ? `nkapflow_tx_${userId}` : 'nkapflow_transactions';
 
 interface FinanceContextValue {
   transactions: Transaction[];
@@ -39,8 +44,10 @@ interface FinanceContextValue {
   balanceTrend: BalanceTrendPoint[];
   trends: { balance: number | null; income: number | null; expense: number | null };
   loading: boolean;
+  error: string | null;
   usingLocalStorage: boolean;
   refresh: () => Promise<void>;
+  reset: () => void;
   addTransaction: (
     payload: Omit<Transaction, 'id' | 'created_at' | 'category' | 'user_id'>
   ) => Promise<void>;
@@ -49,12 +56,15 @@ interface FinanceContextValue {
     payload: Omit<Transaction, 'id' | 'created_at' | 'category' | 'user_id'>
   ) => Promise<void>;
   removeTransaction: (id: string) => Promise<void>;
+  addCategory: (payload: Omit<Category, 'id'>) => Promise<void>;
+  editCategory: (id: string, payload: Partial<Category>) => Promise<void>;
+  removeCategory: (id: string) => Promise<void>;
 }
 
 const FinanceContext = createContext<FinanceContextValue | null>(null);
 
-function readLocalTransactions(): Transaction[] {
-  const raw = localStorage.getItem(STORAGE_KEY);
+function readLocalTransactions(userId?: string): Transaction[] {
+  const raw = localStorage.getItem(getStorageKey(userId));
   if (!raw) return [];
 
   try {
@@ -65,22 +75,23 @@ function readLocalTransactions(): Transaction[] {
   }
 }
 
-function writeLocalTransactions(transactions: Transaction[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+function writeLocalTransactions(userId: string | undefined, transactions: Transaction[]) {
+  localStorage.setItem(getStorageKey(userId), JSON.stringify(transactions));
 }
 
 export function FinanceProvider({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [usingLocalStorage, setUsingLocalStorage] = useState(false);
 
   const persistLocal = useCallback((next: Transaction[]) => {
     setTransactions(next);
-    writeLocalTransactions(next);
+    writeLocalTransactions(user?.id, next);
     setUsingLocalStorage(true);
-  }, []);
+  }, [user?.id]);
 
   const refresh = useCallback(async () => {
     if (!isAuthenticated) {
@@ -99,10 +110,12 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       ]);
       setTransactions(remoteTransactions);
       setCategories(remoteCategories);
-      writeLocalTransactions(remoteTransactions);
+      writeLocalTransactions(user?.id, remoteTransactions);
       setUsingLocalStorage(false);
-    } catch {
-      setTransactions(readLocalTransactions());
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || 'Erreur réseau de connexion au serveur backend.');
+      setTransactions(readLocalTransactions(user?.id));
       setCategories([
         { id: '1', name: 'Alimentation', type: 'expense' },
         { id: '2', name: 'Transport', type: 'expense' },
@@ -114,11 +127,19 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  const reset = useCallback(() => {
+    setTransactions([]);
+    setCategories([]);
+    setError(null);
+    setUsingLocalStorage(false);
+    setLoading(false);
+  }, []);
 
   const addTransaction = useCallback(
     async (payload: Omit<Transaction, 'id' | 'created_at' | 'category' | 'user_id'>) => {
@@ -176,6 +197,48 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     [persistLocal, refresh, transactions]
   );
 
+  const addCategory = useCallback(
+    async (payload: Omit<Category, 'id'>) => {
+      try {
+        await apiCreateCategory(payload);
+        await refresh();
+      } catch {
+        const next: Category = {
+          id: String(Date.now()),
+          ...payload,
+        };
+        setCategories((prev) => [...prev, next]);
+      }
+    },
+    [refresh]
+  );
+
+  const editCategory = useCallback(
+    async (id: string, payload: Partial<Category>) => {
+      try {
+        await apiUpdateCategory(id, payload);
+        await refresh();
+      } catch {
+        setCategories((prev) =>
+          prev.map((c) => (c.id === id ? { ...c, ...payload } : c))
+        );
+      }
+    },
+    [refresh]
+  );
+
+  const removeCategory = useCallback(
+    async (id: string) => {
+      try {
+        await apiDeleteCategory(id);
+        await refresh();
+      } catch {
+        setCategories((prev) => prev.filter((c) => c.id !== id));
+      }
+    },
+    [refresh]
+  );
+
   const summary = useMemo(() => computeSummary(transactions), [transactions]);
   const monthlyData = useMemo(() => computeMonthlyData(transactions), [transactions]);
   const categoryBreakdown = useMemo(() => computeCategoryBreakdown(transactions), [transactions]);
@@ -192,11 +255,16 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       balanceTrend,
       trends,
       loading,
+      error,
       usingLocalStorage,
       refresh,
+      reset,
       addTransaction,
       editTransaction,
       removeTransaction,
+      addCategory,
+      editCategory,
+      removeCategory,
     }),
     [
       transactions,
@@ -207,11 +275,16 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       balanceTrend,
       trends,
       loading,
+      error,
       usingLocalStorage,
       refresh,
+      reset,
       addTransaction,
       editTransaction,
       removeTransaction,
+      addCategory,
+      editCategory,
+      removeCategory,
     ]
   );
 

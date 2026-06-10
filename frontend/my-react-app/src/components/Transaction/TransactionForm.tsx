@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import Btn from '../ui/Btn';
 import Input from '../ui/Input';
-import type { Transaction, Category } from '../../services/api';
-import { C } from '../../theme/colors';
+import Select from '../ui/Select';
+import Textarea from '../ui/Textarea';
+import type { Transaction } from '../../services/transactions.api';
+import type { Category } from '../../services/categories.api';
 
 export interface TransactionFormValues {
   amount: string;
@@ -52,12 +54,22 @@ export default function TransactionForm({
     }
   }, [initial]);
 
-  const filteredCategories = categories.filter((c) => c.type === form.type);
+  const incomes = categories.filter((c) => c.type === 'income');
+  const expenses = categories.filter((c) => c.type === 'expense');
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+    
+    if (name === 'category_id' && value) {
+      const selectedCategory = categories.find((c) => c.id === value);
+      if (selectedCategory) {
+        setForm((prev) => ({ ...prev, [name]: value, type: selectedCategory.type }));
+        return;
+      }
+    }
+
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -77,17 +89,6 @@ export default function TransactionForm({
     } finally {
       setSaving(false);
     }
-  };
-
-  const selectStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '13px 16px',
-    borderRadius: 12,
-    border: `1px solid ${C.inputBorder}`,
-    background: C.inputBg,
-    color: C.t1,
-    fontSize: 14,
-    fontFamily: "'DM Sans', sans-serif",
   };
 
   return (
@@ -129,32 +130,43 @@ export default function TransactionForm({
         <Input label="Date" name="date" type="date" value={form.date} onChange={handleChange} required />
       </div>
 
-      <div>
-        <label className="field-label">Catégorie</label>
-        <select
+      <div className="form-grid" style={{ gridTemplateColumns: '1fr' }}>
+        <Select
+          label="Catégorie"
           name="category_id"
           value={form.category_id}
           onChange={handleChange}
-          style={selectStyle}
         >
           <option value="">Sans catégorie</option>
-          {filteredCategories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+          {expenses.length > 0 && (
+            <optgroup label="Dépenses">
+              {expenses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.icon ? `${c.icon} ` : ''}{c.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
+          {incomes.length > 0 && (
+            <optgroup label="Revenus">
+              {incomes.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.icon ? `${c.icon} ` : ''}{c.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
+        </Select>
       </div>
 
-      <div>
-        <label className="field-label">Notes</label>
-        <textarea
+      <div className="form-grid" style={{ gridTemplateColumns: '1fr' }}>
+        <Textarea
+          label="Notes"
           name="notes"
           value={form.notes}
           onChange={handleChange}
           rows={3}
           placeholder="Description optionnelle"
-          style={{ ...selectStyle, resize: 'vertical' }}
         />
       </div>
 

@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TrendingUp, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import Btn from '../components/ui/Btn';
+import ThemeToggle from '../components/ui/ThemeToggle';
+import { useTheme } from '../context/ThemeContext';
+import { register } from '../services/auth.api';
+import styles from './Register.module.css';
 
 export default function Register() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const getPasswordStrength = (pass: string) => {
-    if (!pass) return { score: 0, label: 'Vide', color: 'bg-gray-800', text: 'text-gray-500' };
+    if (!pass) return { score: 0, label: 'Vide', color: 'var(--theme-border)', text: 'var(--theme-t3)' };
     let score = 0;
     if (pass.length >= 6) score += 1;
     if (pass.length >= 10) score += 1;
@@ -17,158 +26,183 @@ export default function Register() {
     if (/[0-9]/.test(pass)) score += 1;
     if (/[^A-Za-z0-9]/.test(pass)) score += 1;
 
-    if (score <= 2) return { score, label: 'Faible', color: 'bg-red-500', text: 'text-red-500' };
-    if (score <= 4) return { score, label: 'Moyen', color: 'bg-amber-500', text: 'text-amber-500' };
-    return { score, label: 'Excellent', color: 'bg-emerald-500', text: 'text-emerald-500' };
+    if (score <= 2) return { score, label: 'Faible', color: 'var(--theme-red)', text: 'var(--theme-red)' };
+    if (score <= 4) return { score, label: 'Moyen', color: '#f59e0b', text: '#f59e0b' };
+    return { score, label: 'Excellent', color: 'var(--theme-green)', text: 'var(--theme-green)' };
   };
 
   const strength = getPasswordStrength(password);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/login');
+    setLoading(true);
+    setError('');
+    try {
+      await register({ name, email, password });
+      navigate('/login');
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Erreur lors de l'inscription");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#040608] text-gray-100 flex font-sans">
-      {/* Panneau gauche - Avantages exclusifs */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-[#080B10] p-12 flex-col justify-between overflow-hidden border-r border-gray-800">
-        {/* Halos de lumière en arrière-plan */}
-        <div className="absolute top-[-20%] right-[-20%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-20%] left-[-20%] w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none" />
-        
-        {/* Logo (Épuré sans icône) */}
-        <div className="relative z-10 flex items-center gap-2 text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-blue-500 bg-clip-text text-transparent">
-          Nkapflow
-        </div>
-
-        {/* Liste des avantages */}
-        <div className="relative z-10 max-w-md space-y-6">
-          <h1 className="text-3xl font-extrabold tracking-tight text-white leading-tight">
-            Vos avantages exclusifs
-          </h1>
-          
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <span className="text-emerald-400 mt-1">✓</span>
-              <p className="text-gray-400">Tableau de bord intelligent mis à jour en temps réel.</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="text-emerald-400 mt-1">✓</span>
-              <p className="text-gray-400">Analyses avancées et prévisions budgétaires automatisées.</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="text-emerald-400 mt-1">✓</span>
-              <p className="text-gray-400">Sécurité de bout en bout et protocoles de chiffrement renforcés.</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer panneau */}
-        <div className="relative z-10 text-xs text-gray-600">
-          &copy; 2026 Nkapflow. Tous droits réservés.
-        </div>
+    <div className={styles.page} key={theme}>
+      <div className={styles.topbar}>
+        <ThemeToggle />
       </div>
 
-      {/* Panneau droit - Formulaire d'inscription */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center px-6 sm:px-12 lg:px-20 bg-[#040608]">
-        <div className="max-w-md w-full mx-auto space-y-8">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight text-white">Créer un compte</h2>
-            <p className="mt-2 text-sm text-gray-400">Rejoignez notre plateforme de gestion financière nouvelle génération</p>
+      <div className={styles.layout}>
+        {/* ── Panneau héro ── */}
+        <div className={styles.hero}>
+          <div className={`${styles.glow} ${styles.glowGreen}`} />
+          <div className={`${styles.glow} ${styles.glowBlue}`} />
+
+          <div className={styles.brand}>
+            <div className={styles.brandIcon}>
+              <TrendingUp size={19} color="#050A04" strokeWidth={2.5} />
+            </div>
+            <span className={styles.brandName}>Nkapflow</span>
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-            <div className="space-y-4">
-              {/* Nom Complet */}
+          <div className={styles.heroContent}>
+            <h2 className={styles.heroTitle}>Vos avantages exclusifs</h2>
+            <div className={styles.benefits}>
+              <div className={styles.benefitItem}>
+                <span className={styles.benefitCheck}>✓</span>
+                <p className={styles.benefitText}>Tableau de bord intelligent mis à jour en temps réel.</p>
+              </div>
+              <div className={styles.benefitItem}>
+                <span className={styles.benefitCheck}>✓</span>
+                <p className={styles.benefitText}>Analyses avancées et prévisions budgétaires automatisées.</p>
+              </div>
+              <div className={styles.benefitItem}>
+                <span className={styles.benefitCheck}>✓</span>
+                <p className={styles.benefitText}>Sécurité de bout en bout et protocoles de chiffrement renforcés.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Panneau formulaire ── */}
+        <div className={styles.formPanel}>
+          <div className={styles.formInner}>
+            <h1 className={styles.formTitle}>Créer un compte</h1>
+            <p className={styles.formSubtitle}>Rejoignez notre plateforme nouvelle génération</p>
+
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.125rem' }}>
+              {error && (
+                <div className={styles.error}>
+                  {Array.isArray(error) ? error.join(', ') : error}
+                </div>
+              )}
+
               <div>
-                <label htmlFor="name" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                  Nom complet
-                </label>
+                <label className={styles.fieldLabel} htmlFor="reg-name">Nom complet</label>
                 <input
-                  id="name"
+                  id="reg-name"
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#090D14] border border-gray-800 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all duration-200"
-                  placeholder="John Doe"
+                  placeholder="Jean Pierre Kamga"
+                  style={{
+                    width: '100%', padding: '13px 16px', borderRadius: 12,
+                    border: '1px solid var(--theme-input-border)',
+                    background: 'var(--theme-input-bg)',
+                    color: 'var(--theme-t1)', fontSize: 14, boxSizing: 'border-box',
+                  }}
                 />
               </div>
 
-              {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                  Adresse e-mail
-                </label>
+                <label className={styles.fieldLabel} htmlFor="reg-email">Adresse e-mail</label>
                 <input
-                  id="email"
+                  id="reg-email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#090D14] border border-gray-800 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all duration-200"
-                  placeholder="john@exemple.com"
+                  placeholder="vous@exemple.com"
+                  style={{
+                    width: '100%', padding: '13px 16px', borderRadius: 12,
+                    border: '1px solid var(--theme-input-border)',
+                    background: 'var(--theme-input-bg)',
+                    color: 'var(--theme-t1)', fontSize: 14, boxSizing: 'border-box',
+                  }}
                 />
               </div>
 
-              {/* Mot de passe */}
               <div>
-                <label htmlFor="password" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                  Mot de passe
-                </label>
-                <div className="relative">
+                <label className={styles.fieldLabel} htmlFor="reg-password">Mot de passe</label>
+                <div className={styles.passwordWrapper}>
                   <input
-                    id="password"
+                    id="reg-password"
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#090D14] border border-gray-800 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all duration-200"
                     placeholder="••••••••"
+                    style={{
+                      width: '100%', padding: '13px 44px 13px 16px', borderRadius: 12,
+                      border: '1px solid var(--theme-input-border)',
+                      background: 'var(--theme-input-bg)',
+                      color: 'var(--theme-t1)', fontSize: 14, boxSizing: 'border-box',
+                    }}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                    className={styles.togglePwd}
+                    aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                   >
-                    {showPassword ? 'Masquer' : 'Afficher'}
+                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
 
-                {/* Indicateur visuel dynamique de sécurité */}
                 {password && (
-                  <div className="mt-3 space-y-1.5">
-                    <div className="flex justify-between text-xs font-medium">
-                      <span className="text-gray-500">Sécurité du mot de passe :</span>
-                      <span className={strength.text}>{strength.label}</span>
+                  <div style={{ marginTop: 12 }}>
+                    <div className={styles.strengthRow}>
+                      <span className={styles.strengthLabel}>Sécurité du mot de passe :</span>
+                      <span style={{ color: strength.text }}>{strength.label}</span>
                     </div>
-                    <div className="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full ${strength.color} transition-all duration-300`} 
-                        style={{ width: `${(strength.score / 5) * 100}%` }}
+                    <div className={styles.strengthBar}>
+                      <div
+                        className={styles.strengthFill}
+                        style={{
+                          background: strength.color,
+                          width: `${(strength.score / 5) * 100}%`,
+                        }}
                       />
                     </div>
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Bouton de validation */}
-            <button
-              type="submit"
-              className="w-full mt-6 py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-black font-semibold rounded-lg shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] transition-all duration-200 flex items-center justify-center gap-2"
-            >
-              Créer mon compte
-            </button>
-          </form>
+              <Btn onClick={handleSubmit} disabled={loading} style={{ justifyContent: 'center', padding: 14, marginTop: 12 }}>
+                {loading ? (
+                  <div style={{
+                    width: 16, height: 16, border: '2px solid #05a04440',
+                    borderTop: '2px solid #050A04', borderRadius: '50%',
+                    animation: 'spin 0.7s linear infinite',
+                  }} />
+                ) : (
+                  <>
+                    <span>Créer mon compte</span>
+                    <ArrowRight size={15} />
+                  </>
+                )}
+              </Btn>
+            </form>
 
-          <p className="text-center text-sm text-gray-500">
-            Déjà inscrit ?{' '}
-            <a href="#" className="font-medium text-emerald-400 hover:text-emerald-300 transition-colors">
-              Se connecter
-            </a>
-          </p>
+            <p className={styles.footer}>
+              Déjà inscrit ?{' '}
+              <button type="button" onClick={() => navigate('/login')} className={styles.footerLink}>
+                Se connecter
+              </button>
+            </p>
+          </div>
         </div>
       </div>
     </div>

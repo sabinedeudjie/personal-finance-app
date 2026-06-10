@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pencil, Trash2, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
-import type { Transaction } from '../../services/api';
+import type { Transaction } from '../../services/transactions.api';
 
 interface TransactionTableProps {
   transactions: Transaction[];
@@ -68,7 +68,8 @@ export default function TransactionTable({
                 <td className="cell-muted">{formatDate(tx.date)}</td>
                 <td>{tx.notes || '—'}</td>
                 <td>
-                  <span className="category-badge">
+                  <span className="category-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                    {tx.category?.icon ? <span>{tx.category.icon}</span> : null}
                     {tx.category?.name || 'Non classé'}
                   </span>
                 </td>
