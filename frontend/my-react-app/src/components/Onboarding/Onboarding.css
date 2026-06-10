@@ -1,0 +1,255 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-yellow: #FFD700;
+  --primary-yellow-hover: #FFC400;
+  --active-green: #2ECC71;
+  --inactive-gray: #E0E0E0;
+  --bg-color: #F9FAFB;
+  --text-dark: #1F2937;
+  --text-light: #6B7280;
+}
+
+.onboarding-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  padding: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.onboarding-content {
+  width: 100%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Animations */
+.step-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Splash Screen */
+.splash-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+.logo-container {
+  width: 180px;
+  height: 180px;
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+.main-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tagline {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-light);
+  max-width: 250px;
+  line-height: 1.5;
+}
+
+/* Step Containers */
+.step-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.onboarding-header {
+  margin-bottom: 40px;
+}
+
+.mini-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.image-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 320px;
+  background: white;
+  border-radius: 32px;
+  padding: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.onboarding-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+.icon-badge {
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* CSS Styled Icons */
+.search-icon {
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--active-green);
+  border-radius: 50%;
+  position: relative;
+}
+
+.search-icon::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 3px;
+  background: var(--active-green);
+  transform: rotate(45deg);
+  bottom: -6px;
+  right: -6px;
+  border-radius: 2px;
+}
+
+.shield-icon {
+  width: 24px;
+  height: 28px;
+  background: var(--active-green);
+  clip-path: polygon(0% 10%, 50% 0%, 100% 10%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+.text-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.text-content p {
+  font-size: 1rem;
+  color: var(--text-light);
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+/* Footer & Navigation */
+.navigation-footer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  margin-top: auto;
+}
+
+.pagination {
+  display: flex;
+  gap: 12px;
+}
+
+.splash-pagination {
+  position: absolute;
+  bottom: 120px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  width: 24px;
+  border-radius: 4px;
+  background-color: var(--active-green);
+}
+
+.dot.inactive {
+  background-color: var(--inactive-gray);
+}
+
+.next-button {
+  background-color: var(--primary-yellow);
+  border: none;
+  padding: 16px 40px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 100px;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.next-button:hover {
+  transform: translateY(-2px);
+  background-color: var(--primary-yellow-hover);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+.next-button:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+  .onboarding-content {
+    max-width: 100%;
+  }
+
+  .image-frame {
+    max-width: 280px;
+  }
+
+  .text-content h2 {
+    font-size: 1.35rem;
+  }
+}

@@ -10,28 +10,22 @@ import {
   type TooltipItem,
 } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
+import { CHART_CATEGORY_COLORS } from '../../theme/colors';
 import { useChartTheme } from '../../hooks/useChartTheme';
 
 ChartJS.register(ArcElement, Tooltip, Legend, DoughnutController);
 
-interface CategoryData {
+export interface ExpenseCategoryItem {
   category: string;
   amount: number;
-  color: string;
+  color?: string;
 }
 
-interface CategoryPieChartProps {
-  data: CategoryData[];
+interface ExpenseDoughnutChartProps {
+  data: ExpenseCategoryItem[];
 }
 
-const formatCurrency = (value: number): string =>
-  new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'XAF',
-    minimumFractionDigits: 0,
-  }).format(value);
-
-export default function CategoryPieChart({ data }: CategoryPieChartProps) {
+export default function ExpenseDoughnutChart({ data }: ExpenseDoughnutChartProps) {
   const chartTheme = useChartTheme();
   const total = useMemo(() => data.reduce((sum, d) => sum + d.amount, 0), [data]);
 
@@ -41,10 +35,12 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
       datasets: [
         {
           data: data.map((d) => d.amount),
-          backgroundColor: data.map((d) => d.color),
+          backgroundColor: data.map(
+            (d, i) => d.color || CHART_CATEGORY_COLORS[i % CHART_CATEGORY_COLORS.length]
+          ),
           borderColor: chartTheme.doughnutBorder,
           borderWidth: 3,
-          hoverOffset: 8,
+          hoverOffset: 10,
         },
       ],
     }),
@@ -53,7 +49,7 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
 
   const options: ChartOptions<'doughnut'> = useMemo(
     () => ({
-      cutout: '70%',
+      cutout: '72%',
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -64,7 +60,12 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
             label: (context: TooltipItem<'doughnut'>) => {
               const value = typeof context.parsed === 'number' ? context.parsed : 0;
               const pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
-              return ` ${formatCurrency(value)} (${pct}%)`;
+              const formatted = new Intl.NumberFormat('fr-FR', {
+                style: 'currency',
+                currency: 'XAF',
+                minimumFractionDigits: 0,
+              }).format(value);
+              return ` ${context.label}: ${formatted} (${pct}%)`;
             },
           },
         },
@@ -74,7 +75,7 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
   );
 
   if (data.length === 0) {
-    return <p className="chart-empty">Aucune dépense enregistrée.</p>;
+    return <p className="chart-empty">Aucune dépense sur cette période.</p>;
   }
 
   return (
@@ -82,7 +83,7 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
       <div className="pie-wrapper">
         <Doughnut data={chartData} options={options} />
         <div className="pie-center">
-          <span className="pie-center-label">Total</span>
+          <span className="pie-center-label">Total dépenses</span>
           <span className="pie-center-value">
             {new Intl.NumberFormat('fr-FR', {
               notation: 'compact',
@@ -92,9 +93,15 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
         </div>
       </div>
       <div className="pie-legend">
-        {data.map((item) => (
+        {data.map((item, i) => (
           <div key={item.category} className="pie-legend-item">
-            <span className="pie-legend-dot" style={{ backgroundColor: item.color }} />
+            <span
+              className="pie-legend-dot"
+              style={{
+                backgroundColor:
+                  item.color || CHART_CATEGORY_COLORS[i % CHART_CATEGORY_COLORS.length],
+              }}
+            />
             <span className="pie-legend-label">{item.category}</span>
             <span className="pie-legend-pct">
               {total > 0 ? ((item.amount / total) * 100).toFixed(0) : 0}%
